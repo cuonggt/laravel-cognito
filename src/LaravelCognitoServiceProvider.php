@@ -24,6 +24,10 @@ class LaravelCognitoServiceProvider extends ServiceProvider
         $this->app->singleton(CognitoClient::class, function ($app) {
             return new CognitoClient(
                 new CognitoIdentityProviderClient([
+                    'credentials' => [
+                        'key' => config('services.aws.key'),
+                        'secret' => config('services.aws.secret'),
+                    ],
                     'region' => config('cognito.region'),
                     'version' => config('cognito.version'),
                 ]),

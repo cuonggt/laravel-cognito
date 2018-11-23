@@ -7,12 +7,8 @@ use Aws\CognitoIdentityProvider\Exception\CognitoIdentityProviderException;
 
 class CognitoClient
 {
-    const PASSWORD_RESET_REQUIRED_EXCEPTION = 'PasswordResetRequiredException';
-
-    const USER_NOT_FOUND_EXCEPTION = 'UserNotFoundException';
-
     /**
-     * @var CognitoIdentityProviderClient
+     * @var \Aws\CognitoIdentityProvider\CognitoIdentityProviderClient
      */
     protected $client;
 
@@ -29,17 +25,17 @@ class CognitoClient
     /**
      * @var string
      */
-    protected $poolId;
+    protected $userPoolId;
 
     public function __construct(CognitoIdentityProviderClient $client,
                                 $clientId,
                                 $clientSecret,
-                                $poolId)
+                                $userPoolId)
     {
         $this->client = $client;
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
-        $this->poolId = $poolId;
+        $this->userPoolId = $userPoolId;
     }
 
     /**
@@ -53,7 +49,7 @@ class CognitoClient
     public function attempt($username, $password)
     {
         try {
-            $response = $this->client->adminInitiateAuth([
+            $this->client->adminInitiateAuth([
                 'AuthFlow' => 'ADMIN_NO_SRP_AUTH',
                 'AuthParameters' => [
                     'USERNAME' => $username,
@@ -61,15 +57,10 @@ class CognitoClient
                     'SECRET_HASH' => $this->hash($username),
                 ],
                 'ClientId' => $this->clientId,
-                'UserPoolId' => $this->poolId,
+                'UserPoolId' => $this->userPoolId,
             ]);
         } catch (CognitoIdentityProviderException $exception) {
-            if ($exception->getAwsErrorCode() === self::PASSWORD_RESET_REQUIRED_EXCEPTION ||
-                $exception->getAwsErrorCode() === self::USER_NOT_FOUND_EXCEPTION) {
-                return false;
-            }
-
-            throw $exception;
+            return false;
         }
 
         return true;
