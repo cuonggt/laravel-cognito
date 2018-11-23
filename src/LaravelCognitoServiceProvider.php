@@ -3,9 +3,6 @@
 namespace Cuonggt\LaravelCognito;
 
 use Illuminate\Support\ServiceProvider;
-use Cuonggt\LaravelCognito\CognitoGuard;
-use Cuonggt\LaravelCognito\CognitoClient;
-use Cuonggt\LaravelCognito\CognitoUserProvider;
 use Aws\CognitoIdentityProvider\CognitoIdentityProviderClient;
 
 class LaravelCognitoServiceProvider extends ServiceProvider

@@ -67,7 +67,7 @@ class CognitoClient
     }
 
     /**
-     * Creates a HMAC from the given credentials
+     * Creates a HMAC from the given credentials.
      *
      * @param  string  $username
      * @return string
