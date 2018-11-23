@@ -3,7 +3,6 @@
 namespace Cuonggt\LaravelCognito;
 
 use Illuminate\Support\Arr;
-use Cuonggt\LaravelCognito\CognitoClient;
 use Illuminate\Auth\EloquentUserProvider;
 
 class CognitoUserProvider extends EloquentUserProvider
