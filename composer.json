@@ -39,7 +39,7 @@
                 "Cuonggt\\LaravelCognito\\LaravelCognitoServiceProvider"
             ],
             "aliases": {
-                "LaravelCognito": "Cuonggt\\LaravelCognito\\LaravelCognito"
+                "CognitoClient": "Cuonggt\\LaravelCognito\\CognitoClient"
             }
         }
     },

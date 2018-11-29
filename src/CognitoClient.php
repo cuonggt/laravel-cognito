@@ -59,11 +59,80 @@ class CognitoClient
                 'ClientId' => $this->clientId,
                 'UserPoolId' => $this->userPoolId,
             ]);
-        } catch (CognitoIdentityProviderException $exception) {
+        } catch (CognitoIdentityProviderException $e) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Registers a user in the given user pool.
+     *
+     * @param  string  $username
+     * @param  string  $password
+     * @param  array  $attributes
+     * @return bool
+     */
+    public function register($username, $password, array $attributes = [])
+    {
+        try {
+            $response = $this->client->signUp([
+                'ClientId' => $this->clientId,
+                'Password' => $password,
+                'SecretHash' => $this->hash($username),
+                'UserAttributes' => $this->userAttributes($attributes),
+                'Username' => $username,
+            ]);
+        } catch (CognitoIdentityProviderException $e) {
+            throw $e;
+        }
+
+        $this->update($username, ['email_verified' => 'true']);
+
+        return (bool) $response['UserConfirmed'];
+    }
+
+    /**
+     * Update user attributes.
+     * http://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminUpdateUserAttributes.html
+     *
+     * @param  string  $username
+     * @param  array  $attributes
+     * @return bool
+     */
+    public function updateUserAttributes($username, array $attributes)
+    {
+        $this->client->AdminUpdateUserAttributes([
+            'Username' => $username,
+            'UserPoolId' => $this->userPoolId,
+            'UserAttributes' => $this->userAttributes($attributes),
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Get user by the given username.
+     * http://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_GetUser.html
+     *
+     * @param  string  $username
+     * @return mixed
+     */
+    public function getUser($username)
+    {
+        try {
+            $user = $this->client->AdminGetUser([
+                'Username' => $username,
+                'UserPoolId' => $this->userPoolId,
+            ]);
+        } catch (CognitoIdentityProviderException $e) {
+            return false;
+        }
+
+        dd($user->toArray());
+
+        return $user;
     }
 
     /**
@@ -82,5 +151,21 @@ class CognitoClient
                 true
             )
         );
+    }
+
+    /**
+     * Format attributes in Name/Value array
+     *
+     * @param  array  $attributes
+     * @return array
+     */
+    protected function userAttributes(array $attributes)
+    {
+        return array_map(function ($k, $v) {
+            return [
+                'Name' => $k,
+                'Value' => $v,
+            ];
+        }, array_keys($attributes), $attributes);
     }
 }
